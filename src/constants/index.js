@@ -24,3 +24,9 @@ export const DESTINATION_TYPES = {
   DOMESTIC: '国内',
   ABROAD: '国外',
 }
+
+// 排行榜时间范围
+export const LEADERBOARD_RANGES = [
+  { key: 'all', label: '全部' },
+  { key: 'year', label: '今年' },
+]

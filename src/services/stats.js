@@ -54,6 +54,15 @@ export function computeDashboardStats(plans) {
   }
 }
 
+// ===== 排行榜时间范围过滤 =====
+// range: 'all' 全部 | 'year' 今年（按出发日期所在年份判定）
+// 返回新数组，不修改传入的计划数据
+export function filterPlansByRange(plans, range) {
+  if (range !== 'year') return plans
+  const year = String(new Date().getFullYear())
+  return plans.filter((p) => (p.startDate || '').slice(0, 4) === year)
+}
+
 // ===== 成员聚合（供排行榜使用） =====
 export function computeMemberLeaderboard(plans) {
   const map = new Map()
