@@ -54,6 +54,22 @@ export function computeDashboardStats(plans) {
   }
 }
 
+// ===== 时间范围过滤（供排行榜使用） =====
+// 'all' 返回全部计划；'year' 仅保留行程日期与今年有交集的计划
+// startDate/endDate 为 YYYY-MM-DD 字符串，可直接按字典序比较
+export function filterPlansByRange(plans, range) {
+  if (range !== 'year') return plans
+  const year = new Date().getFullYear()
+  const yearStart = `${year}-01-01`
+  const yearEnd = `${year}-12-31`
+  return plans.filter((p) => {
+    const start = p.startDate || p.endDate
+    const end = p.endDate || p.startDate
+    if (!start || !end) return false
+    return start <= yearEnd && end >= yearStart
+  })
+}
+
 // ===== 成员聚合（供排行榜使用） =====
 export function computeMemberLeaderboard(plans) {
   const map = new Map()

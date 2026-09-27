@@ -1,13 +1,22 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useTravelStore } from '../stores/travel'
+import { LEADERBOARD_RANGES } from '../constants'
 
 const store = useTravelStore()
-const board = computed(() => store.leaderboard)
 const tab = ref('travel')
+const range = ref('all')
 
+const board = computed(() => store.leaderboardByRange(range.value))
 const travelBoard = computed(() => board.value.travelMasterBoard)
 const luggageBoard = computed(() => board.value.luggageMasterBoard)
+
+// 所选范围内没有数据时的空态文案
+const emptyText = computed(() =>
+  range.value === 'year'
+    ? '今年还没有出行数据，创建今年的出行计划后即可上榜'
+    : '暂无数据，创建出行计划后即可上榜'
+)
 
 function rankClass(i) {
   return i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : ''
@@ -16,13 +25,26 @@ function rankClass(i) {
 
 <template>
   <div>
-    <div class="tabs" style="box-shadow: none; padding: 0; background: transparent; gap: 8px">
-      <button class="tab board-tab" :class="{ active: tab === 'travel' }" @click="tab = 'travel'">
-        出行达人榜
-      </button>
-      <button class="tab board-tab" :class="{ active: tab === 'luggage' }" @click="tab = 'luggage'">
-        行李管家榜
-      </button>
+    <div class="board-header">
+      <div class="board-tabs">
+        <button class="board-tab" :class="{ active: tab === 'travel' }" @click="tab = 'travel'">
+          出行达人榜
+        </button>
+        <button class="board-tab" :class="{ active: tab === 'luggage' }" @click="tab = 'luggage'">
+          行李管家榜
+        </button>
+      </div>
+      <div class="range-tabs">
+        <button
+          v-for="r in LEADERBOARD_RANGES"
+          :key="r.key"
+          class="range-tab"
+          :class="{ active: range === r.key }"
+          @click="range = r.key"
+        >
+          {{ r.label }}
+        </button>
+      </div>
     </div>
 
     <!-- 出行达人榜 -->
@@ -42,7 +64,7 @@ function rankClass(i) {
           </tr>
         </tbody>
       </table>
-      <p v-else class="empty">暂无数据，创建出行计划后即可上榜</p>
+      <p v-else class="empty">{{ emptyText }}</p>
     </div>
 
     <!-- 行李管家榜 -->
@@ -66,17 +88,64 @@ function rankClass(i) {
           </tr>
         </tbody>
       </table>
-      <p v-else class="empty">暂无数据，创建出行计划后即可上榜</p>
+      <p v-else class="empty">{{ emptyText }}</p>
     </div>
   </div>
 </template>
 
 <style scoped>
+.board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.board-tabs {
+  display: flex;
+  gap: 8px;
+}
+
 .board-tab {
-  flex: 0 0 auto;
+  border: none;
   padding: 9px 24px;
+  border-radius: var(--radius-sm);
   background: var(--surface);
   box-shadow: var(--shadow);
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.board-tab.active {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 500;
+}
+
+.range-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+
+.range-tab {
+  border: none;
+  background: transparent;
+  padding: 6px 16px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.range-tab.active {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 500;
 }
 
 .rank {

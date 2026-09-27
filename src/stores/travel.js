@@ -3,7 +3,7 @@ import { planStorage } from '../services/storage'
 import { generateLuggageTemplate, getDestinationType } from '../services/luggage'
 import { generateDefaultTodos } from '../services/todo'
 import { computeAchievements, TOTAL_ACHIEVEMENTS } from '../services/achievements'
-import { computeDashboardStats, computeMemberLeaderboard } from '../services/stats'
+import { computeDashboardStats, computeMemberLeaderboard, filterPlansByRange } from '../services/stats'
 import { daysBetween } from '../utils/format'
 import { uid } from '../utils/id'
 
@@ -24,6 +24,9 @@ export const useTravelStore = defineStore('travel', {
     totalAchievements: () => TOTAL_ACHIEVEMENTS,
     dashboardStats: (state) => computeDashboardStats(state.plans),
     leaderboard: (state) => computeMemberLeaderboard(state.plans),
+    // 按时间范围（'all' 全部 / 'year' 今年）过滤计划后计算的排行榜，排序规则不变
+    leaderboardByRange: (state) => (range) =>
+      computeMemberLeaderboard(filterPlansByRange(state.plans, range)),
     planById: (state) => (id) => state.plans.find((p) => p.id === id),
   },
 
